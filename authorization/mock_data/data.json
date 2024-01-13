@@ -1,0 +1,82 @@
+[
+  {
+    "uid": {
+      "type": "QuotesApp::Creator",
+      "id": "miquel"
+    },
+    "attrs": {
+      "userId": "user-1bc",
+      "personInformation": {
+        "name": "miquel"
+      }
+    },
+    "parents": []
+  },
+  {
+    "uid": {
+      "type": "QuotesApp::Creator",
+      "id": "carla"
+    },
+    "attrs": {
+      "userId": "user-1a6",
+      "personInformation": {
+        "name": "carla"
+      }
+    },
+    "parents": []
+  },
+  {
+    "uid": {
+      "type": "QuotesApp::Quote",
+      "id": "quote-1df"
+    },
+    "attrs": {
+      "private": true,
+      "text": "A man does what he can until his destiny is revealed.",
+      "author": "Algren",
+      "creator": {
+        "__entity": {
+          "type": "QuotesApp::Creator",
+          "id": "miquel"
+        }
+      }
+    },
+    "parents": []
+  },
+  {
+    "uid": {
+      "type": "QuotesApp::Quote",
+      "id": "quote-fdf"
+    },
+    "attrs": {
+      "private": false,
+      "text": "La vida es como los perros, si le tienes miedo se te tiran a morder.",
+      "author": "Antonio",
+      "creator": {
+        "__entity": {
+          "type": "QuotesApp::Creator",
+          "id": "miquel"
+        }
+      }
+    },
+    "parents": []
+  },
+  {
+    "uid": {
+      "type": "QuotesApp::Quote",
+      "id": "quote-4ff"
+    },
+    "attrs": {
+      "private": false,
+      "text": "The test of the goodness of a thing is its fitness for use.",
+      "author": "Frank Pick",
+      "creator": {
+        "__entity": {
+          "type": "QuotesApp::Creator",
+          "id": "carla"
+        }
+      }
+    },
+    "parents": []
+  }
+]

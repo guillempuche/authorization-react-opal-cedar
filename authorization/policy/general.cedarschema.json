@@ -5,7 +5,11 @@
         "type": "Record",
         "attributes": {
           "name": {
-            "type": "String"
+            "type": "String",
+            "required": true
+          },
+          "premium": {
+            "type": "Boolean"
           }
         }
       },

@@ -7,7 +7,8 @@
     "attrs": {
       "userId": "user-1bc",
       "personInformation": {
-        "name": "miquel"
+        "name": "miquel",
+        "premium": true
       }
     },
     "parents": []
@@ -52,6 +53,24 @@
       "private": false,
       "text": "La vida es como los perros, si le tienes miedo se te tiran a morder.",
       "author": "Antonio",
+      "creator": {
+        "__entity": {
+          "type": "QuotesApp::Creator",
+          "id": "miquel"
+        }
+      }
+    },
+    "parents": []
+  },
+  {
+    "uid": {
+      "type": "QuotesApp::Quote",
+      "id": "quote-jd4"
+    },
+    "attrs": {
+      "private": false,
+      "text": "The value your company extracts from you must be equal to the value you extract from the company.",
+      "author": "Anonymous",
       "creator": {
         "__entity": {
           "type": "QuotesApp::Creator",

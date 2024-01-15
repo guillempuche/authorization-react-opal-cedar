@@ -108,6 +108,19 @@
             "type": "ContextType"
           }
         }
+      },
+      "Test": {
+        "appliesTo": {
+          "principalTypes": [
+            "Creator"
+          ],
+          "resourceTypes": [
+            "Quote"
+          ],
+          "context": {
+            "type": "ContextType"
+          }
+        }
       }
     }
   }

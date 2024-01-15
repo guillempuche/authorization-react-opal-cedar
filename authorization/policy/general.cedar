@@ -10,7 +10,8 @@ permit (
     [QuotesApp::Action::"QuoteView",
      QuotesApp::Action::"QuoteCreate",
      QuotesApp::Action::"QuoteUpdate",
-     QuotesApp::Action::"QuoteDelete"],
+     QuotesApp::Action::"QuoteDelete",
+     QuotesApp::Action::"Test"],
   resource
 )
 when { principal in resource.creator };

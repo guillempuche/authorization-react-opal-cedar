@@ -52,7 +52,11 @@ services:
       # Look for cedar files.
       - OPAL_FILTER_FILE_EXTENSIONS=.cedar
       - OPAL_POLICY_REPO_POLICY_EXTENSIONS=.cedar
+
       - OPAL_STATISTICS_ENABLED=true
+
+      # Show Cedar Agent logs
+      # - OPAL_INLINE_CEDAR_LOG_FORMAT=full
     ports:
       # exposes opal server on the host machine, you can access the server at: http://localhost:7002
       - '7002:7002'

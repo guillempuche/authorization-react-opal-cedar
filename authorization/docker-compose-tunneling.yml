@@ -1,0 +1,16 @@
+# Ngrok guide https://ngrok.com/docs/using-ngrok-with/docker/
+
+version: '3.8'
+services:
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    command:
+      - 'start'
+      - '--all'
+      - '--config'
+      - '/etc/ngrok.yml'
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml
+    ports:
+      - '${OPAL_SERVER_PORT}:${OPAL_SERVER_PORT}'

@@ -1,34 +1,35 @@
-# Authorization using OPAL, OPA, Cedar
+# Comprehensive Guide for a React App, a Javascript Server & Authorization
 
-**Authorization** is the process of determining if a specific user request to do something is allowed by the defined set of policies. Authorization works by evaluating each incoming request against the set of policies provided to Cedar (a specific language for authorization).
+## Overview
 
-Authorization is preceded by **authentication**. Authentication is the process of verifying the principal’s identity, meaning that they are really who they claim to be. Authentication can involve user names, passwords, multi-factor authentication (MFA) devices, or other means of proving identity.
+This guide covers the setup and testing for the Quotes App, focusing on three key areas: the frontend, the server (API and database), and the authorization server. It is tailored to manage quotes and ensure secure and authorized access, suitable for integration with a React frontend.
 
-An authorization request is a request by an application for an authorization decision, asking the question “Can this principal take this action on this resource in this context?”. To reach the decision, Cedar’s authorization engine evaluates a request against each policy, and combines the results. It ultimately produces an authorization response that consists of the decision (Allow or Deny), and the list of determining policies that are the reasons for that decision.
+The purpose of authorization in applications can be summarized by the following key points:
 
-In this example, we focus on controlling access to resources and ensuring that actions within systems adhere to predefined policies. It's about determining who is allowed to do what, and under what conditions.
+1. **Decision-Making Process**: Authorization determines whether a user's request to perform an action is permissible under the set policies.
 
-Tow of the key players in this field is Open Policy Agent (OPA) and Cedar (created in 2023), general-purpose policy engines. They're designed to unify policy enforcement across a wide range of applications and technologies. They allow us to define our policies in a high-level, declarative language, decoupling the policy decision-making process from its enforcement. This means we can write policies once and enforce them anywhere in our system, ensuring consistency and ease of management.
+2. **Policy Evaluation**: It involves evaluating each incoming request against a set of predefined policies, typically written in a specific authorization language like Cedar.
+
+3. **Preceded by Authentication**: Authentication, which verifies the user's identity, is a necessary precursor to authorization. It involves methods like usernames, passwords, or multi-factor authentication (MFA).
+
+4. **Scalable**: Authorization in applications involves analyzing requests ("Can this user perform this action?"), with engines like Cedar evaluating these against policies to allow or deny actions. This process controls access and ensures adherence to policies, defining who can do what and under what conditions, while enabling consistent policy enforcement across systems.
 
 ## Architecture
 
-- Authorization
-  - OPAL Server
-    - **Pub/Sub Channel Management**: Like a broadcasting station, the OPAL Server manages a channel for clients to 'tune in' and receive updates.
-    - **Git Repository Monitoring**: Watches a git repository for changes in policies or static data, using either active checking (polling) or alerts (webhook).
-    - **Data Update Reception**: Receives notifications (via REST API) about new data that needs to be shared.
-    - **Sending Updates to Clients**: Packages and sends these updates to all listening clients.
-    - **Scalability through Backbone Pub/Sub**: Connects with other servers using platforms like Postgres, Redis, or Kafka for efficient handling of more clients and data.
-  - OPAL Client
-    - **Installation with Policy Agent**: Installed alongside a policy enforcer, keeping it updated with the latest rules.
-    - **Subscription to Updates**: Constantly tuned into the OPAL Server's channel for relevant data and policy updates.
-    - **Configuration Retrieval**: Gathers necessary settings and configurations from the server.
-    - **Data Acquisition**: Fetches data from various sources like databases, APIs, or external services.
-    - **Policy Updates Download**: Regularly updates its rulebook (policies) from the server to stay current.
-  - Cedar (you could also use OPA)
-    - A policy engine used for unified policy enforcement across different platforms.
-- React app
-  - A web application built with React.js for managing and visualizing policies and data.
+### Frontend
+- **React App**: A web application built with React.js for managing and visualizing quotes, users & policies.
+
+### Server (API and Database)
+- **Server Runtime & Framework**: [Deno](https://deno.land/) - A modern JavaScript/TypeScript runtime with Oak.
+- **Database**: [PostgreSQL](https://www.postgresql.org/) - A robust object-relational database system.
+- **Containerization**: [Docker](https://docs.docker.com/get-docker/) - Used for running the database and server.
+
+### Authorization Server
+- **OPAL Server**: Manages communication, updates, and policy distribution.
+- **OPAL Client**: Installed alongside the Deno server, receives policy updates.
+- **Cedar**: A general-purpose policy engine for policy enforcement.
+
+### Diagrams
 
 ![Diagram](authorization-diagram-1.png)
 
@@ -36,25 +37,36 @@ Tow of the key players in this field is Open Policy Agent (OPA) and Cedar (creat
 
 _Images from [docs.opal.ac](https://docs.opal.ac/overview/architecture)_
 
-## Test the servers
+## Setup
 
-### Test OPAL Client server
+### Prerequisites
+- Install [Deno](https://deno.land/#installation).
+- Install [Docker](https://docs.docker.com/get-docker/).
+- Basic knowledge of JavaScript or Javascript, Docker, and CLI.
 
-We gonna check [Cedar endpoints](https://github.com/permitio/cedar-agent#api-endpoints):
+### Environment Variables
+- Duplicate and customize `example.env` in both `server` and `authorization` directories.
 
-1. Open one terminal --> Go to directory `cd authorization` --> Run Broadcast, OPAL Server and OPAL Client on Docker.
-2. Open OPAL Client server (the Cedar Agent) on the browser `http://localhost:8180/rapidoc/index.html`.
+## Running the Project
 
-### Test app's backend server
+1. **Clone** the project.
+2. **Start the Database**: In the `server` directory, run `docker-compose -p example-quote-app-database up`.
+3. **HTTPS Setup**: Use `mkcert` to generate certificates for secure connections. Place certificates in both `server` and `frontend` directories.
+4. **Start the Server**: In the `server` directory, run `deno task start`.
+5. **Start the Authorization Server**: In the `authorization` directory, run `docker-compose -p example-quote-app-policy up`.
+6. _TODO: instructions for frontend_
 
-1.
+## ToDo
+
+- Connect data (quotes and users) via server to authorization server
+- Finish frontend
 
 ## Resources
 
-- Explanation and tutorials for OPAL, OPA and Cedar at https://docs.opal.ac/
-- Architecture and flows (users and admins) https://docs.opal.ac/overview/architecture
-- Cedar https://www.cedarpolicy.com/
-- List of API endpoints for your localhost Cedar Client localhost API https://github.com/permitio/cedar-agent#api-endpoints
-- Cedar Agent https://github.com/permitio/cedar-agent
-- Cedar playground https://www.cedarpolicy.com/en/playground
-- Tutorial for OPAL and Cedar https://github.com/permitio/opal-cedar
+- For comprehensive explanations and tutorials on OPAL, OPA, and Cedar, visit [docs.opal.ac](https://docs.opal.ac/).
+- Understand the architecture and user/admin flows at [docs.opal.ac/overview/architecture](https://docs.opal.ac/overview/architecture).
+- Learn more about Cedar at [cedarpolicy.com](https://www.cedarpolicy.com/).
+- Access a list of API endpoints for your local Cedar Client at [github.com/permitio/cedar-agent#api-endpoints](https://github.com/permitio/cedar-agent#api-endpoints).
+- Explore the Cedar Agent repository on GitHub at [github.com/permitio/cedar-agent](https://github.com/permitio/cedar-agent).
+- Experiment with Cedar in the playground at [cedarpolicy.com/en/playground](https://www.cedarpolicy.com/en/playground).
+- Find a tutorial for OPAL and Cedar integration at [github.com/permitio/opal-cedar](https://github.com/permitio/opal-cedar).

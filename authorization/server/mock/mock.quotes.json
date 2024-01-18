@@ -1,0 +1,30 @@
+[
+  {
+    "id": "quote-1df",
+    "text": "A man does what he can until his destiny is revealed.",
+    "author": "Algren",
+    "private": true,
+    "creator": "miquel"
+  },
+  {
+    "id": "quote-fdf",
+    "text": "La vida es como los perros, si le tienes miedo se te tiran a morder.",
+    "author": "Antonio",
+    "private": false,
+    "creator": "miquel"
+  },
+  {
+    "id": "quote-jd4",
+    "text": "The value your company extracts from you must be equal to the value you extract from the company.",
+    "author": "Anonymous",
+    "private": false,
+    "creator": "miquel"
+  },
+  {
+    "id": "quote-4ff",
+    "text": "The test of the goodness of a thing is its fitness for use.",
+    "author": "Frank Pick",
+    "private": false,
+    "creator": "carla"
+  }
+]

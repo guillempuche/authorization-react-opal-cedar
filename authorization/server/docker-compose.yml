@@ -1,10 +1,32 @@
 version: '3.8'
+
 services:
-  web:
-    image: node:latest
+  db:
+    image: postgres:alpine
+    restart: always
+    environment:
+      # Set environment variables from the .env file or environment
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
-      - 3000:3000
+      # Map the port from container to the host
+      - '${DB_PORT}:${DB_PORT}'
     volumes:
-      - .:/app
-    working_dir: /app
-    command: sh -c "npm i -g nodemon && npm i && npm start"
+      # Logs
+      - ./mock/logs:/var/log/postgresql
+  # script-runner service is responsible for setting up the database schema and
+  # populating it with initial data using the create-tables-and-load-data.sh script.
+  script-runner:
+    depends_on:
+      - db
+    restart: 'no'
+    # To locate the Dockerfile file
+    build:
+      context: ./mock
+    volumes:
+      - ./mock/create-tables-and-load-data.sh:/script/create-tables-and-load-data.sh
+      - ./mock/mock.quotes.json:/script/mock.quotes.json
+      - ./mock/mock.creators.json:/script/mock.creators.json
+      - .env:/script/.env
+    command: sh /script/create-tables-and-load-data.sh

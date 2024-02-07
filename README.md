@@ -1,6 +1,4 @@
-# Comprehensive Guide for a React App, a Javascript Server & Authorization
-
-## Overview
+# Comprehensive Guide for Fullstack: React, API Server, Database & Authorization with Cedar
 
 This guide covers the setup and testing for the Quotes App, focusing on three key areas: the frontend, the server (API and database), and the authorization server. It is tailored to manage quotes and ensure secure and authorized access, suitable for integration with a React frontend.
 
@@ -17,17 +15,21 @@ The purpose of authorization in applications can be summarized by the following 
 ## Architecture
 
 ### Frontend
-- **React App**: A web application built with React.js for managing and visualizing quotes, users & policies.
 
-### Server (API and Database)
-- **Server Runtime & Framework**: [Deno](https://deno.land/) - A modern JavaScript/TypeScript runtime with Oak.
+- **React App**: A web application built with React.js for managing and visualizing quotes, users, and policies.
+
+### API Server and Database
+
+- **API Server**: [Deno](https://deno.land/) - A modern JavaScript/TypeScript runtime with Oak.
 - **Database**: [PostgreSQL](https://www.postgresql.org/) - A robust object-relational database system.
-- **Containerization**: [Docker](https://docs.docker.com/get-docker/) - Used for running the database and server.
+- **Containerization**: [Docker](https://docs.docker.com/get-docker/) - Docker runs the database.
 
 ### Authorization Server
-- **OPAL Server**: Manages communication, updates, and policy distribution.
-- **OPAL Client**: Installed alongside the Deno server, receives policy updates.
-- **Cedar**: A general-purpose policy engine for policy enforcement.
+
+- **OPAL Server** - Manages communication, updates, and policy distribution.
+- **OPAL Client** - Installed alongside the Deno server, receives policy updates.
+- **Policy Engine** [Cedar](https://docs.cedarpolicy.com/) - A general-purpose policy engine for policy enforcement.
+- **Containerization**: [Docker](https://docs.docker.com/get-docker/) - Docker runs the server, client and policy engine.
 
 ### Diagrams
 
@@ -35,23 +37,26 @@ The purpose of authorization in applications can be summarized by the following 
 
 ![Diagram with more details](authorization-diagram-2.png)
 
-_Images from [docs.opal.ac](https://docs.opal.ac/overview/architecture)_
+_Images from [docs.opal.ac](https://docs.opal.ac/overview/architecture) by [Permit.io](https://www.permit.io/)_
 
 ## Setup
 
 ### Prerequisites
+
 - Install [Deno](https://deno.land/#installation).
 - Install [Docker](https://docs.docker.com/get-docker/).
-- Basic knowledge of JavaScript or Javascript, Docker, and CLI.
+- Basic knowledge of CLI, clients, servers, and Docker.
+- It has been tested on macOS, not on Linux or Windows. The shell scripts could be a problem.
 
 ### Environment Variables
+
 - Duplicate and customize `example.env` in both `server` and `authorization` directories.
 
 ## Running the Project
 
-1. **Clone** the project.
+1. **Clone** this template.
 2. **Start the Database**: In the `server` directory, run `docker-compose -p example-quote-app-database up`.
-3. **HTTPS Setup**: Use `mkcert` to generate certificates for secure connections. Place certificates in both `server` and `frontend` directories.
+3. **HTTPS Setup**: Use `mkcert` to generate certificates for secure connections in the root folder. I created them with `localhost` name running `mkcert localhost`. Place them in both `server` and `frontend` root directories, you can copy-paste.
 4. **Start the Server**: In the `server` directory, run `deno task start`.
 5. **Start the Authorization Server**: In the `authorization` directory, run `docker-compose -p example-quote-app-policy up`.
 6. _TODO: instructions for frontend_
@@ -63,7 +68,7 @@ _Images from [docs.opal.ac](https://docs.opal.ac/overview/architecture)_
 
 ## Resources
 
-- For comprehensive explanations and tutorials on OPAL, OPA, and Cedar, visit [docs.opal.ac](https://docs.opal.ac/).
+- For comprehensive explanations and tutorials on OPAL, OPA, and Cedar, visit [docs.opal.ac](https://docs.opal.ac/) (made by [Permit.io](https://www.permit.io/))_.
 - Understand the architecture and user/admin flows at [docs.opal.ac/overview/architecture](https://docs.opal.ac/overview/architecture).
 - Learn more about Cedar at [cedarpolicy.com](https://www.cedarpolicy.com/).
 - Access a list of API endpoints for your local Cedar Client at [github.com/permitio/cedar-agent#api-endpoints](https://github.com/permitio/cedar-agent#api-endpoints).

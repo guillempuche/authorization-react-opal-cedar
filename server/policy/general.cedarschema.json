@@ -1,0 +1,127 @@
+{
+  "QuotesApp": {
+    "commonTypes": {
+      "PersonType": {
+        "type": "Record",
+        "attributes": {
+          "name": {
+            "type": "String",
+            "required": true
+          },
+          "premium": {
+            "type": "Boolean"
+          }
+        }
+      },
+      "ContextType": {
+        "type": "Record",
+        "attributes": {
+          "authenticated": {
+            "type": "Boolean",
+            "required": true
+          }
+        }
+      }
+    },
+    "entityTypes": {
+      "Creator": {
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "userId": {
+              "type": "String"
+            },
+            "personInformation": {
+              "type": "PersonType"
+            }
+          }
+        }
+      },
+      "Quote": {
+        "shape": {
+          "type": "Record",
+          "attributes": {
+            "creator": {
+              "type": "Entity",
+              "name": "Creator",
+              "required": true
+            },
+            "text": {
+              "type": "String",
+              "required": true
+            },
+            "author": {
+              "type": "String",
+              "required": true
+            },
+            "private": {
+              "type": "Boolean",
+              "required": true
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "QuoteView": {
+        "appliesTo": {
+          "resourceTypes": [
+            "Quote"
+          ]
+        }
+      },
+      "QuoteCreate": {
+        "appliesTo": {
+          "principalTypes": [
+            "Creator"
+          ],
+          "resourceTypes": [
+            "Quote"
+          ],
+          "context": {
+            "type": "ContextType"
+          }
+        }
+      },
+      "QuoteUpdate": {
+        "appliesTo": {
+          "principalTypes": [
+            "Creator"
+          ],
+          "resourceTypes": [
+            "Quote"
+          ],
+          "context": {
+            "type": "ContextType"
+          }
+        }
+      },
+      "QuoteDelete": {
+        "appliesTo": {
+          "principalTypes": [
+            "Creator"
+          ],
+          "resourceTypes": [
+            "Quote"
+          ],
+          "context": {
+            "type": "ContextType"
+          }
+        }
+      },
+      "Test": {
+        "appliesTo": {
+          "principalTypes": [
+            "Creator"
+          ],
+          "resourceTypes": [
+            "Quote"
+          ],
+          "context": {
+            "type": "ContextType"
+          }
+        }
+      }
+    }
+  }
+}

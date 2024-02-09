@@ -1,9 +1,10 @@
 {
   "tasks": {
-    "start": "deno run --allow-net --allow-read --allow-env mod.ts"
+    "start": "deno run --unstable-hmr --allow-net --allow-read --allow-env mod.ts",
+    "debug": "deno run --unstable-hmr --inspect --allow-net --allow-read --allow-env mod.ts"
   },
   "fmt": {
-    "useTabs": false,
+    "useTabs": true,
     "indentWidth": 2,
     "lineWidth": 80,
     "semiColons": false,

@@ -68,7 +68,7 @@ _Images from [docs.opal.ac](https://docs.opal.ac/overview/architecture) by [Perm
 
 ## Resources
 
-- For comprehensive explanations and tutorials on OPAL, OPA, and Cedar, visit [docs.opal.ac](https://docs.opal.ac/) (made by [Permit.io](https://www.permit.io/))_.
+- For comprehensive explanations and tutorials on OPAL, OPA, and Cedar, visit [docs.opal.ac](https://docs.opal.ac/) (made by [Permit.io](https://www.permit.io/)).
 - Understand the architecture and user/admin flows at [docs.opal.ac/overview/architecture](https://docs.opal.ac/overview/architecture).
 - Learn more about Cedar at [cedarpolicy.com](https://www.cedarpolicy.com/).
 - Access a list of API endpoints for your local Cedar Client at [github.com/permitio/cedar-agent#api-endpoints](https://github.com/permitio/cedar-agent#api-endpoints).

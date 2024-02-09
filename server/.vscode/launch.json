@@ -1,0 +1,20 @@
+{
+	"configurations": [
+		{
+			"request": "launch",
+			"name": "Launch Deno Server",
+			"type": "node",
+			"program": "${workspaceFolder}/mod.ts",
+			"cwd": "${workspaceFolder}",
+			"runtimeExecutable": "/opt/homebrew/bin/deno",
+			"runtimeArgs": [
+				"run",
+				"--inspect-wait",
+				"--allow-net",
+				"--allow-read",
+				"--allow-env"
+			],
+			"attachSimplePort": 9229
+		}
+	]
+}

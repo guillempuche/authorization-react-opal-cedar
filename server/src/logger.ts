@@ -24,11 +24,17 @@ export const logger = async (ctx: Context, next: () => Promise<unknown>) => {
 		headers.get('user-agent') || 'N/A'
 	}"`;
 
-	const message = statusColor(
+	const requestMessage = statusColor(
 		`${bold(
-			`${method} ${status} ${url}`
+			`REQUEST ${method} ${status} ${url}`
 		)} -h ${acceptHeader} ${contentTypeHeader} ${authorizationHeader} ${userAgentHeader}`
 	);
+	const responseMessage = statusColor(
+		`${bold(`REQUEST ${method} ${status} ${url}`)} -h ${
+			ctx.response.headers
+		} ${contentTypeHeader} ${authorizationHeader} ${userAgentHeader}`
+	);
 
-	console.log(message);
+	console.log(requestMessage);
+	// console.log(responseMessage);
 };

@@ -1,27 +1,21 @@
 version: '3.8'
-
 services:
   db:
     image: postgres:alpine
     restart: always
     environment:
-      # Set environment variables from the .env file or environment
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      # Map the port from container to the host
       - '${DB_PORT}:${DB_PORT}'
     volumes:
-      # Logs
       - ./mock/logs:/var/log/postgresql
-  # script-runner service is responsible for setting up the database schema and
-  # populating it with initial data using the create-tables-and-load-data.sh script.
+
   script-runner:
     depends_on:
       - db
     restart: 'no'
-    # To locate the Dockerfile file
     build:
       context: ./mock
     volumes:
@@ -30,3 +24,132 @@ services:
       - ./mock/mock.creators.json:/script/mock.creators.json
       - .env:/script/.env
     command: sh /script/create-tables-and-load-data.sh
+
+  deno_server:
+    image: denoland/deno:alpine
+    ports:
+      - '${PORT_SERVER}:${PORT_SERVER}'
+    volumes:
+      - .:/server # Mount the current directory to the container
+      - deno_cache:/deno-dir # Use a volume for the Deno cache
+    working_dir: /server # We ensure that when Deno runs, it does so with the context of your server's root directory, making it aware of your mod.ts, deps.ts, and other files.
+    environment:
+      - DENO_DIR=/deno-dir
+    command: >
+      sh -c "
+      deno run --unstable-hmr --allow-net --allow-read --allow-env mod.ts
+      "
+    user: deno
+    depends_on:
+      - db
+      - script-runner
+
+  # When scaling the opal-server to multiple nodes and/or multiple workers, we use
+  # a *broadcast* channel to sync between all the instances of opal-server.
+  # Under the hood, this channel is implemented by encode/broadcaster (see link below).
+  # At the moment, the broadcast channel can be either: postgresdb, redis or kafka.
+  # The format of the broadcaster URI string (the one we pass to opal server as `OPAL_BROADCAST_URI`) is specified here:
+  # https://github.com/encode/broadcaster#available-backends
+  broadcast_channel:
+    image: postgres:alpine
+    environment:
+      - POSTGRES_DB=opal_postgres
+      - POSTGRES_USER=opal_postgres
+      - POSTGRES_PASSWORD=opal_postgres
+    depends_on:
+      - deno_server
+  opal_server:
+    image: permitio/opal-server:latest
+    environment:
+      # # Secure keys must be implemented in production
+      # # Configuring the security parameters https://docs.opal.ac/getting-started/running-opal/run-opal-server/security-parameters
+      # - OPAL_AUTH_PRIVATE_KEY=${OPAL_AUTH_PRIVATE_KEY}
+      # - OPAL_AUTH_PUBLIC_KEY=${OPAL_AUTH_PUBLIC_KEY}
+      # - OPAL_AUTH_MASTER_TOKEN=test-token
+
+      # The broadcast backbone uri used by opal server workers (see comments above for: broadcast_channel)
+      - OPAL_BROADCAST_URI=opal_postgres://opal_postgres:opal_postgres@broadcast_channel:5432/postgres
+      # number of uvicorn workers to run inside the opal-server container
+      - UVICORN_NUM_WORKERS=4
+
+      # The git repo hosting the policy:
+      # - if this repo is not public, you can pass an ssh key via `OPAL_POLICY_REPO_SSH_KEY`)
+      # - the repo we pass in this example is *public* and acts as an example repo with dummy rego policy
+      # - for more info, see: https://docs.opal.ac/tutorials/track_a_git_repo
+      - OPAL_POLICY_REPO_URL=https://github.com/guillempuche/opal-cedar-react.git
+      - OPAL_POLICY_REPO_MAIN_BRANCH=main
+      - OPAL_POLICY_SUBSCRIPTION_DIRS=policy
+
+      # in this example we will use a polling interval of 30 seconds to check for new policy updates (git commits affecting the rego policy).
+      # however, it is better to utilize a git *webhook* to trigger the server to check for changes only when the repo has new commits.
+      # for more info see: https://docs.opal.ac/tutorials/track_a_git_repo
+      - OPAL_POLICY_REPO_POLLING_INTERVAL=30
+
+      # configures from where the opal client should initially fetch data (when it first goes up, after disconnection, etc).
+      # the data sources represents from where the opal clients should get a "complete picture" of the data they need.
+      # after the initial sources are fetched, the client will subscribe only to update notifications sent by the server.
+      # If you change the bearer token, also change it in the app server.
+
+      # # Mock data for testing purposes
+      # - OPAL_DATA_CONFIG_SOURCES={"config":{"entries":[{"url":"http://cedar_data_nginx/mock.data.json","topics":["policy_data"],"dst_path":""}]}}
+      # - OPAL_DATA_CONFIG_SOURCES={"config":{"entries":[{"url":"https://localhost:3001/policy-config","topics":["policy_data"],"config":{"headers":{"Authorization":"Bearer FAKE-POLICY-SECRET"}}}]}}
+      # - OPAL_DATA_CONFIG_SOURCES={"config":{"entries":[{"url":"https://host.docker.internal:3001/policy-config","topics":["policy_data"],"config":{"headers":{"Authorization":"Bearer FAKE-POLICY-SECRET"}}}]}}
+      - OPAL_DATA_CONFIG_SOURCES={"config":{"entries":[{"url":"http://deno_server:1993/policy-config","topics":["policy_data"],"config":{"headers":{"Authorization":"Bearer FAKE-POLICY-SECRET"}}}]}}
+
+      - OPAL_LOG_FORMAT_INCLUDE_PID=true
+
+      # Look for cedar files.
+      - OPAL_FILTER_FILE_EXTENSIONS=.cedar
+      - OPAL_POLICY_REPO_POLICY_EXTENSIONS=.cedar
+
+      - OPAL_STATISTICS_ENABLED=false
+
+      # Show Cedar Agent logs:
+      # NONE = “none”  # no logs are piped
+      # MINIMAL = “minimal”  # only the event name is logged
+      # HTTP = “http”  # tries to extract http method, path and response status code
+      # FULL = “full”  # logs the entire data dict returned
+      - OPAL_INLINE_CEDAR_LOG_FORMAT=full
+    ports:
+      - '${PORT_OPAL_SERVER}:${PORT_OPAL_SERVER}'
+    depends_on:
+      - broadcast_channel
+    # network_mode: host
+  opal_client:
+    image: permitio/opal-client-cedar:latest
+    environment:
+      # Server URI in production should be `https`. More here https://docs.opal.ac/getting-started/running-opal/run-opal-client/server-uri
+      - OPAL_SERVER_URL=http://opal_server:${PORT_OPAL_SERVER}
+
+      # # Local certificates
+      # - OPAL_CLIENT_SELF_SIGNED_CERTIFICATES_ALLOWED=true
+      # # Certificate Authority (CA)
+      # - OPAL_CLIENT_SSL_CONTEXT_TRUSTED_CA_FILE=/certificates/localhost.pem
+
+      # Logs
+      - OPAL_LOG_FORMAT_INCLUDE_PID=true
+      - OPAL_STATISTICS_ENABLED=true
+      - OPAL_INLINE_CEDAR_LOG_FORMAT=full
+    # volumes:
+    #   # The public local Certificate Authority (CA) of the domain (in dev environment, the domain is probably `localhost`).
+    #   - ./localhost.pem:/certificates/localhost.pem
+
+    # # ALERT: only in dev environment, else delete it. It enables the app server & Docker connection.
+    # network_mode: host
+    ports:
+      # exposes opal client on the host machine, you can access the client at: http://localhost:7000
+      - '7766:7000'
+      # you can access the Cedar agent APIs
+      - '8180:8180'
+    depends_on:
+      - opal_server
+    # this command is not necessary when deploying OPAL for real, it is simply a trick for dev environments
+    # to make sure that opal-server is already up before starting the client.
+    command: sh -c "exec ./wait-for.sh opal_server:${PORT_OPAL_SERVER} --timeout=20 -- ./start.sh"
+    # links:
+    #   - cedar_data_nginx
+
+# Improve startup times by avoiding redownloading and recompiling dependencies every time the container starts.
+volumes:
+  deno_cache:
+  opa_backup:

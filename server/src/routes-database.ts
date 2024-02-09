@@ -1,19 +1,23 @@
-import { Client, Router, dotenv } from '../deps.ts';
+import { Client, Router } from '../deps.ts';
 import { userAuthentication } from './authentication.ts';
 import { ICreator, IQuote } from './types.ts';
 
 export const routesDatabase = async (router: Router): Promise<void> => {
-	// Load environment variables
-	const env = await dotenv({ export: true });
-
 	// Create a database connection
 	const client = new Client({
-		database: env.DB_NAME,
-		hostname: env.DB_HOSTNAME,
-		password: env.DB_PASSWORD,
-		port: env.DB_PORT,
-		user: env.DB_USERNAME,
+		// database: env.DB_NAME,
+		// hostname: env.DB_HOSTNAME,
+		// password: env.DB_PASSWORD,
+		// port: env.DB_PORT,
+		// user: env.DB_USERNAME,
+		hostname: Deno.env.get('DB_HOSTNAME'),
+		database: Deno.env.get('DB_NAME'),
+		password: Deno.env.get('DB_PASSWORD'),
+		port: Deno.env.get('DB_PORT'),
+		user: Deno.env.get('DB_USERNAME'),
 	});
+
+	// console.log(env.PORT_SERVER);
 
 	await client.connect();
 
@@ -35,38 +39,34 @@ export const routesDatabase = async (router: Router): Promise<void> => {
 
 	// Route to create a quote
 	router.post('/quotes', async (ctx) => {
-		try {
-			const body = await ctx.request.body().value;
-			const { text, author, private: isPrivate, creator } = body;
-
-			await client.queryObject<IQuote>`
-    INSERT INTO quotes (text, author, private, creator) VALUES (${text}, ${author}, ${isPrivate}, ${creator});
-`;
-			ctx.response.status = 201;
-			ctx.response.body = { message: 'Quote created successfully' };
-		} catch (error) {
-			ctx.response.status = 500;
-			ctx.response.body = { error: 'Failed to create quote' };
-		}
+		// try {
+		// 	const { text, author, private: isPrivate, creator } = ctx.request.body;
+		// 	await client.queryObject<IQuote>`
+		//     INSERT INTO quotes (text, author, private, creator) VALUES (${text}, ${author}, ${isPrivate}, ${creator});
+		// `;
+		// 	ctx.response.status = 201;
+		// 	ctx.response.body = { message: 'Quote created successfully' };
+		// } catch (error) {
+		// 	ctx.response.status = 500;
+		// 	ctx.response.body = { error: 'Failed to create quote' };
+		// }
 	});
 
 	// Route to update a quote
 	router.put('/quotes/:id', async (ctx) => {
-		try {
-			const id = ctx.params.id;
-			const body = await ctx.request.body().value;
-			const { text, author, private: isPrivate, creator } = body;
-
-			await client.queryObject`
-            UPDATE quotes SET text = ${text}, author = ${author}, private = ${isPrivate}, creator = ${creator} WHERE id = ${id};
-        `;
-
-			ctx.response.status = 200;
-			ctx.response.body = { message: 'Quote updated successfully' };
-		} catch (error) {
-			ctx.response.status = 500;
-			ctx.response.body = { error: 'Failed to update quote' };
-		}
+		// try {
+		// 	const id = ctx.params.id;
+		// 	const body = await ctx.request.body().value;
+		// 	const { text, author, private: isPrivate, creator } = body;
+		// 	await client.queryObject`
+		//         UPDATE quotes SET text = ${text}, author = ${author}, private = ${isPrivate}, creator = ${creator} WHERE id = ${id};
+		//     `;
+		// 	ctx.response.status = 200;
+		// 	ctx.response.body = { message: 'Quote updated successfully' };
+		// } catch (error) {
+		// 	ctx.response.status = 500;
+		// 	ctx.response.body = { error: 'Failed to update quote' };
+		// }
 	});
 
 	// Route to delete a quote

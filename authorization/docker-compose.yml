@@ -1,19 +1,5 @@
 version: '3.8'
 services:
-  # # Expose OPAL Server to public internet (from the localhost to a public domain).
-  # # Guide https://ngrok.com/docs/getting-started/
-  # tunneling-ngrok:
-  #   image: ngrok/ngrok:latest
-  #   restart: always
-  #   environment:
-  #     - NGROK_AUTHTOKEN=${NGROK_TOKEN}
-  #   command: http --log stdout ${OPAL_SERVER_PORT} --domain=${TUNNELING_DOMAIN}
-  # ports:
-  #   - '${OPAL_SERVER_PORT}:${OPAL_SERVER_PORT}'
-  # - 40:40
-  # volumes:
-  #   - ./ngrok.yml:/etc/ngrok.yml
-
   # # A simple nginx server to serve our mock data sources.
   # cedar_data_nginx:
   #   image: nginx:latest
@@ -86,21 +72,22 @@ services:
 
       - OPAL_STATISTICS_ENABLED=true
 
-      # # Show Cedar Agent logs:
-      # # NONE = “none”  # no logs are piped
-      # # MINIMAL = “minimal”  # only the event name is logged
-      # # HTTP = “http”  # tries to extract http method, path and response status code
-      # # FULL = “full”  # logs the entire data dict returned
+      # Show Cedar Agent logs:
+      # NONE = “none”  # no logs are piped
+      # MINIMAL = “minimal”  # only the event name is logged
+      # HTTP = “http”  # tries to extract http method, path and response status code
+      # FULL = “full”  # logs the entire data dict returned
       - OPAL_INLINE_CEDAR_LOG_FORMAT=full
     ports:
       - '${OPAL_SERVER_PORT}:${OPAL_SERVER_PORT}'
     depends_on:
       - broadcast_channel
+    # network_mode: host
   opal_client:
     image: permitio/opal-client-cedar:latest
     volumes:
-      # The public Certificate Authority (CA) of the domain (in dev environment, the domain could be `localhost`).
-      - ./localhost.pem:/certs/localhost.pem
+      # The public local Certificate Authority (CA) of the domain (in dev environment, the domain is probably `localhost`).
+      - ./localhost.pem:/certificates/localhost.pem
     # # ALERT: only in dev environment, else delete it. It enables the app server & Docker connection.
     # network_mode: host
     ports:
@@ -114,10 +101,10 @@ services:
       # Server URI in production should be `https`. More here https://docs.opal.ac/getting-started/running-opal/run-opal-client/server-uri
       - OPAL_SERVER_URL=http://opal_server:7002
 
-      # # Certificates
-      # - OPAL_CLIENT_SELF_SIGNED_CERTIFICATES_ALLOWED=true
-      # # The public Certificate Authority (CA)
-      # - OPAL_CLIENT_SSL_CONTEXT_TRUSTED_CA_FILE=/certs/localhost.pem
+      # Local certificates
+      - OPAL_CLIENT_SELF_SIGNED_CERTIFICATES_ALLOWED=true
+      # Certificate Authority (CA)
+      - OPAL_CLIENT_SSL_CONTEXT_TRUSTED_CA_FILE=/certificates/localhost.pem
 
       # Logs
       - OPAL_LOG_FORMAT_INCLUDE_PID=true

@@ -35,7 +35,7 @@ done
 #   sleep 5 # Increase sleep time to reduce the frequency of checks
 # done
 
-echo "PostgreSQL is up and running 🏃..."
+echo "🏃 PostgreSQL is up and running..."
 
 echo "Creating the database tables \"quotes\" and \"creators\" if they don't exist yet..."
 
@@ -56,7 +56,7 @@ PGPASSWORD="$PASSWORD" psql -h "$HOSTNAME" -U "$USERNAME" -d "$DATABASE" <<EOSQL
   );
 EOSQL
 
-echo "Tables created ✅."
+echo "✅ Tables created"
 
 echo "Inserting or updating data in the \"quotes\" and \"creators\" tables..."
 
@@ -72,6 +72,6 @@ PGPASSWORD="$PASSWORD" psql -h "$HOSTNAME" -U "$USERNAME" -d "$DATABASE" -c \
 PGPASSWORD="$PASSWORD" psql -h "$HOSTNAME" -U "$USERNAME" -d "$DATABASE" -c \
   "INSERT INTO creators SELECT * FROM json_populate_recordset(NULL::creators, '$CREATORS_JSON') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, premium = EXCLUDED.premium;"
 
-echo "Tables prefilled successfully with the mock data ✅."
+echo "✅ Tables prefilled successfully with the mock data"
 
-echo "\"script-runner\" is shutting down, but \"db\" is running 👌."
+echo "🏃 \"script-runner\" is shutting down, but \"db\" is still running..."

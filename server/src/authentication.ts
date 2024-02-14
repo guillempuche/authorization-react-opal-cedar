@@ -26,7 +26,7 @@ export async function policyAuthentication(ctx: Context, next: Next) {
 	const authHeader = ctx.request.headers.get('Authorization');
 
 	// If you change the bearer token, also change it in the OPAL server configuration in Docker.
-	if (!authHeader || authHeader !== 'Bearer FAKE-POLICY-SECRET') {
+	if (!authHeader || authHeader !== `Bearer ${Deno.env.get('JWT')}`) {
 		ctx.response.status = 401;
 		ctx.response.body = { error: 'Unauthorized' };
 		return;

@@ -94,7 +94,7 @@ services:
       # - OPAL_DATA_CONFIG_SOURCES={"config":{"entries":[{"url":"http://cedar_data_nginx/mock.data.json","topics":["policy_data"],"dst_path":""}]}}
       # - OPAL_DATA_CONFIG_SOURCES={"config":{"entries":[{"url":"https://localhost:3001/policy-config","topics":["policy_data"],"config":{"headers":{"Authorization":"Bearer FAKE-POLICY-SECRET"}}}]}}
       # - OPAL_DATA_CONFIG_SOURCES={"config":{"entries":[{"url":"https://host.docker.internal:3001/policy-config","topics":["policy_data"],"config":{"headers":{"Authorization":"Bearer FAKE-POLICY-SECRET"}}}]}}
-      - OPAL_DATA_CONFIG_SOURCES={"config":{"entries":[{"url":"http://deno_server:1993/policy-config","topics":["policy_data"],"config":{"headers":{"Authorization":"Bearer FAKE-POLICY-SECRET"}}}]}}
+      - OPAL_DATA_CONFIG_SOURCES={"config":{"entries":[{"url":"http://deno_server:${PORT_SERVER}/policy-config","topics":["policy_data"],"config":{"headers":{"Authorization":"Bearer ${JWT}"}}}]}}
 
       - OPAL_LOG_FORMAT_INCLUDE_PID=true
 

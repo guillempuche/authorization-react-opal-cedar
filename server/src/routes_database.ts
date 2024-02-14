@@ -5,19 +5,12 @@ import { ICreator, IQuote } from './types.ts';
 export const routesDatabase = async (router: Router): Promise<void> => {
 	// Create a database connection
 	const client = new Client({
-		// database: env.DB_NAME,
-		// hostname: env.DB_HOSTNAME,
-		// password: env.DB_PASSWORD,
-		// port: env.DB_PORT,
-		// user: env.DB_USERNAME,
 		hostname: Deno.env.get('DB_HOSTNAME'),
 		database: Deno.env.get('DB_NAME'),
 		password: Deno.env.get('DB_PASSWORD'),
 		port: Deno.env.get('DB_PORT'),
 		user: Deno.env.get('DB_USERNAME'),
 	});
-
-	// console.log(env.PORT_SERVER);
 
 	await client.connect();
 
